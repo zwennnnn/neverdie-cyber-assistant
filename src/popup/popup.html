@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>NEVER DIE | Cyber Security Assistant</title>
+    <link rel="stylesheet" href="../popup/popup.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="../assets/js/jspdf.umd.min.js"></script>
+    <script src="../utils/report-generator.js"></script>
+</head>
+<body>
+    <div id="apiKeyModal" class="modal" style="display: block;">
+        <div class="modal-content api-key-modal">
+            <h2>🔑 Groq API Anahtarı Gerekli</h2>
+            <p>Güvenlik analizi yapabilmek için Groq API anahtarı gerekiyor.</p>
+            
+            <form id="apiKeyForm" class="api-key-form">
+                <input 
+                    type="password" 
+                    id="apiKey" 
+                    placeholder="API Anahtarını Girin (gsk_...)" 
+                    pattern="gsk_[a-zA-Z0-9]+"
+                    required
+                >
+                <div class="help-text">
+                    API anahtarı "gsk_" ile başlamalıdır. 
+                    <a href="https://console.groq.com/keys" target="_blank" rel="noopener">Buradan</a> 
+                    yeni bir anahtar oluşturabilirsiniz.
+                </div>
+                
+                <div id="apiKeyError" class="error-message"></div>
+                
+                <button type="submit" class="submit-button">
+                    API Anahtarını Kaydet ve Başla
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Ana içerik -->
+    <div id="mainContent" class="main-container">
+        <div class="scroll-content">
+            <div class="scan-header">
+                <h2>Güvenlik Analizi</h2>
+                <button id="showLegal" class="legal-button">
+                    📜 Yasal Bilgiler
+                </button>
+                <div class="score-circle">
+                    <span>?</span>
+                </div>
+            </div>
+
+            <div class="scan-sections">
+                <!-- URL Güvenliği -->
+                <div class="scan-section">
+                    <div class="section-header">
+                        <h3>URL Güvenliği</h3>
+                        <span class="section-score">?</span>
+                    </div>
+                    <ul class="findings-list" id="urlFindings">
+                        <li class="finding-item waiting">Analiz için butona tıklayın...</li>
+                    </ul>
+                </div>
+
+                <!-- Form Güvenliği -->
+                <div class="scan-section">
+                    <div class="section-header">
+                        <h3>Form Güvenliği</h3>
+                        <span class="section-score">?</span>
+                    </div>
+                    <ul class="findings-list" id="formFindings">
+                        <li class="finding-item waiting">Analiz için butona tıklayın...</li>
+                    </ul>
+                </div>
+
+                <!-- Header Güvenliği -->
+                <div class="scan-section">
+                    <div class="section-header">
+                        <h3>Header Güvenliği</h3>
+                        <span class="section-score">?</span>
+                    </div>
+                    <ul class="findings-list" id="headerFindings">
+                        <li class="finding-item waiting">Analiz için butona tıklayın...</li>
+                    </ul>
+                </div>
+
+                <!-- Meta Analizi -->
+                <div class="scan-section">
+                    <div class="section-header">
+                        <h3>Meta Analizi</h3>
+                        <span class="section-score">?</span>
+                    </div>
+                    <ul class="findings-list" id="metaFindings">
+                        <li class="finding-item waiting">Analiz için butona tıklayın...</li>
+                    </ul>
+                </div>
+
+                <!-- İçerik Güvenliği -->
+                <div class="scan-section">
+                    <div class="section-header">
+                        <h3>İçerik Güvenliği</h3>
+                        <span class="section-score">?</span>
+                    </div>
+                    <ul class="findings-list" id="contentFindings">
+                        <li class="finding-item waiting">Analiz için butona tıklayın...</li>
+                    </ul>
+                </div>
+
+                <!-- Çerez Güvenliği -->
+                <div class="scan-section">
+                    <div class="section-header">
+                        <h3>Çerez Güvenliği</h3>
+                        <span class="section-score">?</span>
+                    </div>
+                    <ul class="findings-list" id="cookieFindings">
+                        <li class="finding-item waiting">Analiz için butona tıklayın...</li>
+                    </ul>
+                </div>
+
+                <!-- AI Tavsiyeleri -->
+                <div class="ai-recommendations">
+                    <h3>🤖 AI Güvenlik Tavsiyeleri</h3>
+                    <div id="aiRecommendations">
+                        <div class="ai-recommendation waiting">Analiz için butona tıklayın...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button class="scan-button" id="startScan">
+                Güvenlik Analizi Başlat
+            </button>
+        </div>
+    </div>
+
+    <!-- Legal Modal -->
+    <div id="legalModal" class="modal" style="display: none;">
+        <div class="modal-content legal-content">
+            <button class="close-button" title="Kapat" aria-label="Kapat"></button>
+            <div class="tab-content">
+                <div id="privacyTab" class="tab-pane active">
+                    <h1>NEVER DIE Gizlilik Politikası</h1>
+                    <div class="last-updated">Son Güncelleme: 24 Ocak 2025</div>
+                    <div class="legal-content-wrapper">
+                        <h2>1. Veri Toplama</h2>
+                        <ul>
+                            <li>Bu eklenti hiçbir kişisel veri toplamamaktadır.</li>
+                            <li>Yapılan analizler tamamen yerel olarak gerçekleştirilir.</li>
+                            <li>Groq API ile yapılan iletişimde sadece güvenlik analiz sonuçları paylaşılır.</li>
+                        </ul>
+
+                        <h2>2. Veri Kullanımı</h2>
+                        <ul>
+                            <li>Toplanan veriler sadece güvenlik analizi için kullanılır.</li>
+                            <li>Verileriniz üçüncü taraflarla paylaşılmaz.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="termsTab" class="tab-pane">
+                    <h1>NEVER DIE Kullanım Koşulları</h1>
+                    <div class="last-updated">Son Güncelleme: 24 Ocak 2025</div>
+                    <div class="legal-content-wrapper">
+                        <h2>1. Hizmet Kullanımı</h2>
+                        <ul>
+                            <li>Bu eklenti güvenlik analizi amacıyla kullanılmalıdır.</li>
+                            <li>Kötü niyetli kullanım yasaktır.</li>
+                        </ul>
+
+                        <h2>2. Sorumluluk Reddi</h2>
+                        <ul>
+                            <li>Analiz sonuçları %100 kesinlik garantisi vermez.</li>
+                            <li>Kullanıcı, eklentiyi kendi sorumluluğunda kullanır.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="disclaimerTab" class="tab-pane">
+                    <h1>NEVER DIE Yasal Uyarı</h1>
+                    <div class="legal-content-wrapper">
+                        <h2>Genel Uyarı</h2>
+                        <ul>
+                            <li>Bu eklenti bir güvenlik tarama aracıdır.</li>
+                            <li>Sonuçlar bilgilendirme amaçlıdır.</li>
+                            <li>Profesyonel güvenlik değerlendirmesi yerine geçmez.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="../utils/scanner-utils.js"></script>
+    <script src="../utils/groq-client.js"></script>
+
+
+    <script src="../analysis/passive-analyzer.js"></script>
+    <script src="../analysis/form-scanner.js"></script>
+    <script src="../analysis/header-scanner.js"></script>
+    <script src="../analysis/meta-scanner.js"></script>
+    <script src="../analysis/content-scanner.js"></script>
+    <script src="../analysis/cookie-scanner.js"></script>
+
+ 
+    <script src="popup.js"></script>
+</body>
+</html>
